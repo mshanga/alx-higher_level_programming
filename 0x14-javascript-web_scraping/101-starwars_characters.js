@@ -1,17 +1,28 @@
 #!/usr/bin/node
-// script that gets the contents of a webpage and stores it in a file.
+// A script that prints all characters of a Star Wars movie
+// Display characters name in the same order of the list  “characters” in the /films/ response
 
-const url = process.argv[2];
-const file = process.argv[3];
-const req = require('request');
-const fileStream = require('fs');
+const request = require('request');
+const url = 'https://swapi-api.alx-tools.com/api/films/' + process.argv[2];
 
-req(url, function (error, response, body) {
-  if (error) {
-    console.log(error);
+function printCharacters (characters, idx) {
+  request(characters[idx], (err, res, body) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(JSON.parse(body).name);
+      if (idx + 1 < characters.length) {
+        printCharacters(characters, idx + 1);
+      }
+    }
+  });
+}
+
+request(url, (err, res, body) => {
+  if (err) {
+    console.log(err);
   } else {
-    fileStream.writeFile(file, body, 'utf-8', (error) => {
-      if (error) console.log(error);
-    });
+    const characters = JSON.parse(body).characters;
+    printCharacters(characters, 0);
   }
 });
